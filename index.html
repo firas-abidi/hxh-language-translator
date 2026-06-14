@@ -382,9 +382,12 @@ function parseKana(text) {
   return out;
 }
 
-// kanji readings come from kuromoji, which only loads once a kanji actually shows up
-let tokenizer = null, dictState = 'idle';
+// Kanji readings come from kuromoji. It runs in a Web Worker so the heavy
+// dictionary build/tokenise never blocks the UI (which used to freeze the tab).
 const KANJI = /[㐀-鿿]/;
+let dictState = 'idle', kuroWorker = null;
+const readingCache = new Map();   // raw input -> all-kana reading
+const pendingReq = new Set();
 
 function setDictStatus(state) {
   const dot = document.getElementById('dictDot');
@@ -399,27 +402,47 @@ function setDictStatus(state) {
     msg.textContent = 'Ready · kana is instant, kanji loads on demand · 準備完了'; }
 }
 
-function ensureDict() {
-  if (dictState === 'loading' || dictState === 'ready') return;
+function ensureWorker() {
+  if (kuroWorker || dictState === 'loading' || dictState === 'fail') return;
   dictState = 'loading'; setDictStatus('loading');
-  const build = () => kuromoji.builder({ dicPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' })
-    .build((err, t) => {
-      if (err) { dictState = 'fail'; setDictStatus('fail'); return; }
-      tokenizer = t; dictState = 'ready'; setDictStatus('ready'); render();
-    });
-  if (window.kuromoji) { build(); return; }
-  const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js';
-  s.onload = build;
-  s.onerror = () => { dictState = 'fail'; setDictStatus('fail'); };
-  document.head.appendChild(s);
+  const code = [
+    "importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');",
+    "var tk=null;",
+    "kuromoji.builder({dicPath:'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/'})",
+    " .build(function(e,t){ if(e){postMessage({err:String(e)});return;} tk=t; postMessage({ready:1}); });",
+    "onmessage=function(ev){",
+    "  var text=ev.data.text;",
+    "  if(!tk){ postMessage({text:text, reading:text}); return; }",
+    "  var r=tk.tokenize(text).map(function(x){return x.reading||x.surface_form;}).join('');",
+    "  postMessage({text:text, reading:r});",
+    "};"
+  ].join('\n');
+  try {
+    const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+    kuroWorker = new Worker(url);
+    kuroWorker.onmessage = (ev) => {
+      const d = ev.data;
+      if (d.ready) { dictState = 'ready'; setDictStatus('ready'); render(); return; }
+      if (d.err)   { dictState = 'fail'; setDictStatus('fail'); return; }
+      if (d.text !== undefined) {
+        readingCache.set(d.text, d.reading);
+        pendingReq.delete(d.text);
+        if (document.getElementById('kanaInput').value === d.text) render();
+      }
+    };
+    kuroWorker.onerror = () => { dictState = 'fail'; setDictStatus('fail'); };
+  } catch (e) { dictState = 'fail'; setDictStatus('fail'); }
 }
 
 function toKana(text) {
-  if (!KANJI.test(text)) return text;
-  if (!tokenizer) { ensureDict(); return text; }
-  return tokenizer.tokenize(text)
-    .map(t => t.reading || t.surface_form).join('');
+  if (!KANJI.test(text)) return text;             // pure kana: instant, no dictionary
+  if (readingCache.has(text)) return readingCache.get(text);
+  ensureWorker();
+  if (dictState === 'ready' && !pendingReq.has(text)) {
+    pendingReq.add(text);
+    kuroWorker.postMessage({ text });             // convert off-thread
+  }
+  return text;   // render the kana now; kanji fill in when the worker replies
 }
 
 setDictStatus('idle');
