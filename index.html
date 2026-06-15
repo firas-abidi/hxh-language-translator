@@ -386,8 +386,9 @@ function parseKana(text) {
     const ch = text[i];
     if (SMALL[ch]) { if (IMGS[SMALL[ch]]) out.push(SMALL[ch]); continue; }   // small kana -> full kana
     if (SOKUON.has(ch)) { if (IMGS['つ']) out.push('つ'); continue; }         // っ -> つ
-    if (ch === 'ー') {                                                        // long vowel -> repeat the vowel
-      const prev = out.length ? out[out.length - 1] : null;
+    if (ch === 'ー') {                                                        // long vowel
+      if (IMGS['ー']) { out.push('ー'); continue; }                            // use the chart's lengthening symbol
+      const prev = out.length ? out[out.length - 1] : null;                   // fallback: repeat the vowel
       const v = prev && VOWEL[prev];
       if (v && IMGS[v]) out.push(v);
       continue;
@@ -690,8 +691,8 @@ const REF = [
   ['む','MU'], ['ん','N'],  ['な','NA'], ['ね','NE'], ['に','NI'], ['の','NO'], ['ぬ','NU'],
   ['お','O'],  ['ら','RA'], ['れ','RE'], ['り','RI'], ['ろ','RO'], ['る','RU'],
   ['さ','SA'], ['せ','SE'], ['し','SHI'],['そ','SO'], ['す','SU'], ['た','TA'],
-  ['て','TE'], ['と','TO'], ['つ','TSU'],['う','U'],  ['わ','WA'],
-  ['や','YA'], ['よ','YO'], ['ゆ','YU'], ['ざ','ZA'], ['ぜ','ZE'],
+  ['て','TE'], ['と','TO'], ['つ','TSU'],['う','U'],  ['わ','WA'], ['を','WO'],
+  ['や','YA'], ['よ','YO'], ['ゆ','YU'], ['ざ','ZA'], ['ぜ','ZE'], ['ー','LONG'],
   ['ぞ','ZO'], ['ず','ZU'], ['ば','BA'], ['べ','BE'], ['び','BI'], ['ぼ','BO'],
   ['ぶ','BU'], ['だ','DA'], ['で','DE'], ['ぢ','DI'], ['ど','DO'], ['づ','DU'],
   ['が','GA'], ['げ','GE'], ['ぎ','GI'], ['ご','GO'], ['ぐ','GU'], ['じ','JI'],
