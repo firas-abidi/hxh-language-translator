@@ -588,6 +588,7 @@ function render() {
   ph.classList.add('gone');
   setExportEnabled(true);
   renderSymbols(tokens);
+  if (!window._didTranslate) { window._didTranslate = true; track('translate', 'Translated text'); }
 }
 
 document.getElementById('kanaInput').addEventListener('input', render);
@@ -614,6 +615,7 @@ document.getElementById('presets').addEventListener('click', e => {
   settings.border = b.dataset.border === '1';
   settings.transBg = b.dataset.trans === '1';
   syncControls(); render();
+  track('preset', 'Preset: ' + b.textContent.trim());
 });
 syncControls();
 
@@ -625,18 +627,20 @@ if (GC) {
   gs.setAttribute('data-goatcounter', 'https://' + GC + '.goatcounter.com/count');
   document.head.appendChild(gs);
 }
-function trackImage() {
+function track(path, title) {
   if (window.goatcounter && goatcounter.count)
-    goatcounter.count({ path: 'image-created', title: 'Image created', event: true });
+    goatcounter.count({ path: path, title: title, event: true });
 }
 async function showStats() {
   if (!GC) return;
   const base = 'https://' + GC + '.goatcounter.com/counter/';
   const get = p => fetch(base + p + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
-  const [v, i] = await Promise.all([get('TOTAL'), get('image-created')]);
+  const num = x => (x && x.count) ? parseInt(String(x.count).replace(/[^0-9]/g, '')) || 0 : 0;
+  const [v, dl, cp] = await Promise.all([get('TOTAL'), get('download'), get('copy')]);
+  const made = num(dl) + num(cp);
   const parts = [];
   if (v && v.count) parts.push('👁 ' + v.count + ' visits');
-  if (i && i.count) parts.push('🖼 ' + i.count + ' images made');
+  if (made) parts.push('🖼 ' + made.toLocaleString() + ' images made');
   const el = document.getElementById('stats');
   if (parts.length) { el.textContent = parts.join('   ·   '); el.hidden = false; }
 }
@@ -658,7 +662,7 @@ document.getElementById('copyBtn').addEventListener('click', async () => {
     }, 'image/png'));
     st.textContent = '✓ Copied to clipboard · コピーしました';
     st.className = '';
-    trackImage();
+    track('copy', 'Copied image');
   } catch (e) {
     st.textContent = '✗ Copy failed · コピー失敗: ' + e.message;
     st.className = 'err';
@@ -670,7 +674,7 @@ document.getElementById('dlBtn').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
   a.download = 'hunter-script.png'; a.click();
-  trackImage();
+  track('download', 'Downloaded image');
 });
 
 // symbol chart
@@ -681,6 +685,7 @@ document.getElementById('rtog').addEventListener('click', () => {
     ? '▴ Hide Reference · 文字一覧を非表示'
     : '▾ Show Symbol Reference · 文字一覧を表示';
   if (open && !rb.dataset.built) buildRef();
+  if (open) track('reference-opened', 'Opened symbol reference');
 });
 
 // same order as the printed chart: alphabetical by romaji, top-to-bottom per column
