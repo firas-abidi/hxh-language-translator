@@ -238,7 +238,9 @@ footer a:hover{text-decoration:underline;text-shadow:0 0 12px rgba(184,146,63,.4
     Hunter × Hunter syllabary. Because the chart covers all 71 base sounds
     (the full <i>gojūon</i> plus the voiced ゛ and semi-voiced ゜ marks),
     <b>any</b> Japanese word or phrase can be written in the HxH language.
-    <span class="jp">入力文字はかなに変換され、各かながHxH言語の文字に対応します。全71音をカバーしているため、あらゆる日本語の単語やフレーズをHxH言語で表記できます。</span>
+    Contracted sounds like きゃ or しょ are written with their full kana (き+や, し+よ),
+    and a long vowel (ー) repeats the vowel — so no sound is ever dropped.
+    <span class="jp">入力文字はかなに変換され、各かながHxH言語の文字に対応します。全71音をカバーしており、拗音（きゃ・しょ等）は大きなかなで、長音は母音の繰り返しで表すため、音が欠けることはありません。</span>
   </div>
   <div class="portrait-col">
     <img class="portrait" src="assets/portrait_togashi.png" alt="">
@@ -355,29 +357,44 @@ const K2H = {
   'ッ':'っ',
 };
 
-// break the text into kana (handles the small ゃゅょ compounds)
-const SMALL_CMP = new Set('ゃゅょャュョ'.split(''));
+// turn the text into a stream of glyph keys, without dropping sounds:
+// small kana (ゃゅょ / ぁぃぅぇぉ) -> their full-size kana, the sokuon っ -> つ,
+// and the long-vowel mark ー -> a repeat of the previous syllable's vowel.
 function toCanonical(ch) { return K2H[ch] || ch; }
-function buildCmp(main, small) {
-  const hm = toCanonical(main);
-  const hs = ('ゃャ'.includes(small)) ? 'ゃ' : ('ゅュ'.includes(small)) ? 'ゅ' : 'ょ';
-  const k = hm + hs;
-  if (IMGS[k]) return k;
-  return null;
-}
+const SMALL = {
+  'ゃ':'や','ゅ':'ゆ','ょ':'よ','ャ':'や','ュ':'ゆ','ョ':'よ',
+  'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お','ァ':'あ','ィ':'い','ゥ':'う','ェ':'え','ォ':'お'
+};
+const SOKUON = new Set(['っ','ッ']);
+// each base kana -> the vowel it ends on (for the long-vowel mark)
+const VOWEL = (() => {
+  const m = {};
+  const rows = {
+    'あ':'あいうえお','か':'かきくけこ','さ':'さしすせそ','た':'たちつてと','な':'なにぬねの',
+    'は':'はひふへほ','ま':'まみむめも','ら':'らりるれろ','が':'がぎぐげご','ざ':'ざじずぜぞ',
+    'だ':'だぢづでど','ば':'ばびぶべぼ','ぱ':'ぱぴぷぺぽ'
+  };
+  const vow = 'あいうえお';
+  for (const r of Object.values(rows)) for (let i = 0; i < r.length; i++) m[r[i]] = vow[i];
+  m['や']='あ'; m['ゆ']='う'; m['よ']='お'; m['わ']='あ'; m['を']='お';
+  return m;
+})();
+
 function parseKana(text) {
   const out = [];
-  let i = 0;
-  while (i < text.length) {
-    if (i + 1 < text.length && SMALL_CMP.has(text[i + 1])) {
-      const c = buildCmp(text[i], text[i + 1]);
-      if (c) { out.push(c); i += 2; continue; }
-    }
+  for (let i = 0; i < text.length; i++) {
     const ch = text[i];
+    if (SMALL[ch]) { if (IMGS[SMALL[ch]]) out.push(SMALL[ch]); continue; }   // small kana -> full kana
+    if (SOKUON.has(ch)) { if (IMGS['つ']) out.push('つ'); continue; }         // っ -> つ
+    if (ch === 'ー') {                                                        // long vowel -> repeat the vowel
+      const prev = out.length ? out[out.length - 1] : null;
+      const v = prev && VOWEL[prev];
+      if (v && IMGS[v]) out.push(v);
+      continue;
+    }
     const key = toCanonical(ch);
     if (IMGS[key]) out.push(key);
     else if (' 　\n\r'.includes(ch)) out.push(' ');
-    i++;
   }
   return out;
 }
