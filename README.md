@@ -1,13 +1,10 @@
 # Hunter × Hunter Language Translator
 
-Type something in Japanese and it gets rewritten in the Hunter × Hunter script (the
-made-up "language" from the manga). Kanji, hiragana, katakana all work. You can recolor
+Type something in Japanese and it gets rewritten in the Hunter × Hunter language. Kanji, hiragana, katakana all work. You can recolor
 the result and save it as an image.
 
-I made this because I'm a fan of the show and got tired of looking up every single
-character on the chart by hand whenever I wanted to write something in it.
+I made this because I'm a fan of the manga and have had the idea since long .
 
-By Firas — [@sa0rif0](https://x.com/sa0rif0). Find a bug or want something added? Message me on X.
 
 ## Running it
 
