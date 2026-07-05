@@ -3,7 +3,7 @@
 Type something in Japanese and it gets rewritten in the Hunter × Hunter language. Kanji, hiragana, katakana all work. You can recolor
 the result and save it as an image.
 
-I made this because I'm a fan of the manga and have had the idea since long .
+I made this because I'm a fan of the mangaand Togashi and have had the idea since long .
 
 
 ## Running it
