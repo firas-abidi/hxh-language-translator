@@ -1,27 +1,26 @@
 # Hunter × Hunter Language Translator
 
-Type something in Japanese and it gets rewritten in the Hunter × Hunter language. Kanji, hiragana, katakana all work. You can recolor
-the result and save it as an image.
+**Try it here: [hxhlanguage.org](https://hxhlanguage.org)**
 
-I made this because I'm a fan of the manga and Togashi and have had the idea since long .
+Type something in Japanese and the website translates it to the Hunter × Hunter language. Kanji, hiragana and katakana all work. You can change the colors and save the result as an image.
 
+I'm a big fan of the manga and of Togashi, and I've wanted to make this for a long time.
 
 ## Running it
 
-Static page, nothing to install. Just open `index.html`.
+It's a static page, so there's nothing to install. Just open `index.html`.
 
-One thing: the "Copy Image" button only works once the site is hosted (it needs HTTPS).
-That's a browser rule, not a bug, so it won't copy if you open the file straight off your
-disk. "Download PNG" works no matter what.
+"Copy Image" only works when the site is hosted over HTTPS, because browsers block clipboard access otherwise. If you open the file locally, use "Download PNG" instead.
 
-## What's in the folder
+## Files
 
-- `index.html` — the app, all of it
-- `hxh_sprites.js` — every character as a tiny image, baked into one file
-- `assets/` — the favicon and the artwork in the header
-- `tools/` — the Python I used to cut the characters out of the reference chart and prep
-  the header art. Not needed to run the site, I just keep them here so I don't lose them.
-- `sources/` — the original images I traced everything from
+- `index.html`: the whole app
+- `hxh_sprites.js`: every character as a small image, all in one file
+- `assets/`: favicon and header art
+- `tools/`: Python scripts I used to cut the characters out of the reference chart and prepare the header art. You don't need them to run the site.
+- `sources/`: the original images I traced from
+
+## How it works
 
 ## How it works under the hood
 
@@ -32,5 +31,3 @@ is swapped for its glyph and painted onto a canvas, which is what you copy or do
 
 Fonts load from Google Fonts and the kanji dictionary from a CDN, so it wants internet the
 first time around.
-
-
