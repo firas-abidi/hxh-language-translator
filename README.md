@@ -1,5 +1,7 @@
 # Hunter × Hunter Language Translator
 
+<img width="927" height="764" alt="image" src="https://github.com/user-attachments/assets/a8e48476-54e8-41ff-80cd-1e70120a6e3c" />
+
 **Try it here: [hxhlanguage.org](https://hxhlanguage.org)**
 
 Type something in Japanese and the website translates it to the Hunter × Hunter language. Kanji, hiragana and katakana all work. You can change the colors and save the result as an image.
@@ -19,9 +21,7 @@ It's a static page, so there's nothing to install. Just open `index.html`.
 - `assets/`: favicon and header art
 - `tools/`: Python scripts I used to cut the characters out of the reference chart and prepare the header art. You don't need them to run the site.
 - `sources/`: the original images I traced from
-
-## How it works
-
+  
 ## How it works under the hood
 
 Kanji don't map onto the script one-to-one, so the text first gets turned into kana (its
