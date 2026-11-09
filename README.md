@@ -31,3 +31,7 @@ is swapped for its glyph and painted onto a canvas, which is what you copy or do
 
 Fonts load from Google Fonts and the kanji dictionary from a CDN, so it wants internet the
 first time around.
+
+<img width="605" height="671" alt="image" src="https://github.com/user-attachments/assets/200c425e-d960-4c3f-b860-db58a2eb6259" />
+
+"You should enjoy the little detours to the fullest. Because that's where you'll find the things more important than what you want."
