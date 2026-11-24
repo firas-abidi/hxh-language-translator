@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- Link-preview card (shown when hxhlanguage.org is shared on X, Discord, WhatsApp...).
+     Rendered to assets/og-card.png at exactly 1200x630 with headless Chrome:
+     chrome --headless --hide-scrollbars --window-size=1200,630 --screenshot=assets/og-card.png tools/og-card.html -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:wght@700&family=Shippori+Mincho:wght@600&display=block" rel="stylesheet">
+<script src="../hxh_sprites.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1200px;height:630px;overflow:hidden}
+body{background:#0a0908;color:#b8923f;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background-image:radial-gradient(ellipse 70% 55% at 50% -10%,rgba(184,146,63,.14) 0%,transparent 65%)}
+.t{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;line-height:1.05;letter-spacing:.01em}
+.j{font-family:'Shippori Mincho',serif;font-weight:600;font-size:40px;letter-spacing:.12em;padding-left:.12em;margin-top:8px}
+.orn{display:grid;grid-template-columns:260px auto 260px;align-items:center;column-gap:26px;margin:30px 0 34px}
+.orn::before,.orn::after{content:"";height:1px}
+.orn::before{background:linear-gradient(to left,#6b5523,transparent)}
+.orn::after{background:linear-gradient(to right,#6b5523,transparent)}
+.orn img{width:78px;height:auto;opacity:.9}
+.row{display:flex;gap:10px;padding:18px 30px;border:1px solid #7a6128}
+.row i{width:62px;height:62px;background:#c8a840;-webkit-mask:var(--g) center/contain no-repeat;mask:var(--g) center/contain no-repeat}
+.url{font-family:'Cinzel',serif;font-weight:600;font-size:20px;letter-spacing:.3em;padding-left:.3em;color:#7a6128;margin-top:34px}
+</style>
+</head>
+<body>
+<div class="t">Hunter × Hunter Language Translator</div>
+<div class="j">ハンター言語翻訳機</div>
+<div class="orn"><img src="../assets/doggy%20toggy.png" alt=""></div>
+<div class="row" id="row"></div>
+<div class="url">hxhlanguage.org</div>
+<script>
+// "はんたー はんたー" (Hunter Hunter) written in the HxH script
+const row = document.getElementById('row');
+for (const k of ['は','ん','た','ー','は','ん','た','ー']) {
+  const i = document.createElement('i');
+  i.style.setProperty('--g', `url(${SPRITES[k]})`);
+  row.appendChild(i);
+}
+</script>
+</body>
+</html>

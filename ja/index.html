@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハンター言語翻訳機 | Hunter × Hunter Language Translator</title>
+<meta name="description" content="日本語を入力すると、ハンター×ハンターの文字で表示します。漢字・ひらがな・カタカナに対応。好きな色を選んで画像として保存できます。冨樫義博先生へのファンメイドのトリビュートです。">
+<link rel="canonical" href="https://hxhlanguage.org/ja/">
+<!-- the same page in English (/) and Japanese (/ja/, built by tools/build_ja.py):
+     Google and Yahoo! JAPAN show each searcher the version in their language -->
+<link rel="alternate" hreflang="en" href="https://hxhlanguage.org/">
+<link rel="alternate" hreflang="ja" href="https://hxhlanguage.org/ja/">
+<link rel="alternate" hreflang="x-default" href="https://hxhlanguage.org/">
+<meta property="og:site_name" content="HxH Language Translator">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="ハンター言語翻訳機 | Hunter × Hunter Language Translator">
+<meta property="og:description" content="日本語を入力すると、ハンター×ハンターの文字で表示します。好きな色を選んで画像として保存できます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hxhlanguage.org/ja/">
+<meta property="og:image" content="https://hxhlanguage.org/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hunter × Hunter Language Translator, with ハンターハンター written in the HxH language">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hxhlanguage.org/assets/og-card.png">
+<meta name="twitter:creator" content="@sa0rif0">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon.png?v=7">
+<link rel="apple-touch-icon" href="../assets/favicon-180.png?v=7">
+<script src="../hxh_sprites.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;900&family=Cormorant+Garamond:wght@600;700&family=Spectral:ital,wght@0,400;0,600;1,400&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0908;--ink:#0c0a08;
+  --card:#14110c;--card2:#1a160f;
+  --gold:#b8923f;--gold2:#dcb866;--gold3:#7a6128;
+  --text:#dccfb4;--text2:#9b8e72;
+  --border:#2a2317;--cbg:#0a0806;
+  --ember:#7c3a24;
+  --serif:'Spectral','Shippori Mincho',Georgia,serif;
+  --disp:'Cinzel','Shippori Mincho',serif;
+  --title:'Cormorant Garamond','Shippori Mincho',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17.5px}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--serif);font-weight:400;
+  min-height:100vh;padding:18px;overflow-x:hidden;
+  /* one quiet wash of light behind the title; everything else stays flat */
+  background-image:radial-gradient(ellipse 70% 38% at 50% -6%,rgba(184,146,63,.085) 0%,transparent 62%);
+  background-repeat:no-repeat;
+}
+.app{max-width:880px;margin:0 auto}
+
+/* header */
+header{padding:24px 16px 6px;}
+.topbar{display:flex;align-items:center;gap:14px}
+.t-side{flex:1 1 0;min-width:0;padding-left:22px} /* mirrors .corner's padding-right so the title sits on the page center */
+.title-stack{flex:0 0 auto;display:flex;flex-direction:column;align-items:center}
+.corner{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:16px;padding-right:22px}
+.xwrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex:0 0 auto}
+.xlabel{font-family:var(--disp);font-size:.56rem;font-weight:900;letter-spacing:.22em;color:var(--gold3);text-transform:uppercase}
+.xlink{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--gold3);background:#0d0b08;
+  transition:all .18s;}
+a.xlabel{text-decoration:none;transition:color .18s}
+a.xlabel:hover{color:var(--gold2)}
+.ging-link{display:flex;align-items:center;justify-content:center;height:42px;transition:transform .18s}
+.ging-link:hover{transform:scale(1.05)}
+/* margin note shown once on page load: "you can / donate now" in italic to the left of Ging (Firas),
+   a small hand-drawn arrow that draws itself into his panel, one gold shine across the words,
+   then the whole note fades away after about 5 seconds */
+.ging-link{position:relative}
+.donate-hint{position:absolute;right:calc(100% - 12px);top:50%;
+  display:flex;align-items:center;gap:3px;pointer-events:none;white-space:nowrap;
+  opacity:0;transform:translateY(-50%) rotate(-3deg);will-change:opacity,transform;
+  animation:hint-in .5s ease-out .3s forwards,hint-out .9s cubic-bezier(.4,0,.2,1) 5.3s forwards}
+.donate-hint .txt{display:flex;flex-direction:column;align-items:flex-end;
+  font-family:var(--serif);font-style:italic;font-size:.92rem;line-height:1.2;letter-spacing:.01em;
+  color:transparent;-webkit-background-clip:text;background-clip:text;
+  background-image:linear-gradient(105deg,var(--gold2) 38%,#fff1c9 50%,var(--gold2) 62%);
+  background-size:320% 100%;background-position:100% 0;
+  animation:hint-shine 1.3s ease-in-out 1s forwards}
+.donate-hint svg{width:28px;height:19px;flex:0 0 auto;margin-top:6px;overflow:visible;position:relative;top:-11px;
+  fill:none;stroke:var(--gold2);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round}
+.donate-hint path{stroke-dasharray:1;stroke-dashoffset:1;animation:hint-draw .5s ease-out .65s forwards}
+.donate-hint path.head{animation-delay:1.1s;animation-duration:.18s}
+/* Japanese line under the English, set like the site's other bilingual labels */
+.donate-hint .jp{font-family:'Shippori Mincho',serif;font-style:normal;font-weight:600;
+  font-size:.66rem;letter-spacing:.1em;margin-right:-.1em;margin-top:5px;line-height:1.35;opacity:.85;
+  display:flex;flex-direction:column;align-items:flex-end}
+@keyframes hint-in{from{opacity:0;transform:translate(-6px,-50%) rotate(-3deg)}to{opacity:1;transform:translateY(-50%) rotate(-3deg)}}
+@keyframes hint-out{from{opacity:1}99%{opacity:0;visibility:visible}to{opacity:0;visibility:hidden}}
+@keyframes hint-shine{to{background-position:0 0}}
+@keyframes hint-draw{to{stroke-dashoffset:0}}
+/* where space beside Ging (Firas) is tight (small phones, and laptops just wide enough for the
+   one-row header), the note becomes three short lines so it never touches the title or the edge */
+@media(max-width:470px),(min-width:1311px) and (max-width:1480px){
+  .donate-hint{right:calc(100% - 20px)}
+  .donate-hint .txt{font-size:.7rem;line-height:1.15}
+  .donate-hint .w2{display:block}
+  .donate-hint .jp{font-size:.5rem;letter-spacing:.05em;margin-right:-.05em;margin-top:3px}
+  .donate-hint svg{width:16px;height:12px;margin-top:4px}
+}
+/* very small phones: tuck the note a little closer to the panel */
+@media(max-width:350px){
+  .donate-hint{right:calc(100% - 28px)}
+  .donate-hint .txt{font-size:.64rem}
+  .donate-hint .jp{font-size:.46rem}
+  .donate-hint svg{width:12px;height:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .donate-hint{animation:hint-out 0s linear 5.3s forwards;opacity:1}
+  .donate-hint .txt{animation:none;color:var(--gold2);background:none}
+  .donate-hint path{animation:none;stroke-dashoffset:0}
+}
+.xlink svg{width:18px;height:18px;fill:var(--gold2);transition:fill .18s}
+.xlink:hover{border-color:var(--gold2);background:#120e09}
+.xlink:hover svg{fill:#f0d98a}
+.logo{
+  font-family:var(--title);font-weight:700;
+  --ls:.015em;letter-spacing:var(--ls);padding-left:var(--ls);text-align:center;
+  line-height:1.16;white-space:nowrap;
+  font-size:2.45rem;
+  color:var(--gold);
+}
+.logo-sub{font-family:var(--title);font-size:1.75rem;font-weight:600;
+  --ls:.1em;letter-spacing:var(--ls);padding-left:calc(var(--ls) + .08em);text-align:center;
+  color:var(--gold);margin-top:4px;line-height:1.2;}
+/* letter-spacing is also added after the last character; the matching
+   padding-left keeps each title line's visible letters on the true center
+   (+.08em on the Japanese line evens out the empty space to the right of 機) */
+.ging-top{width:118px;height:auto;opacity:.95;flex:0 0 auto;
+  -webkit-mask-image:radial-gradient(ellipse 96% 80% at 50% 50%,#000 36%,transparent 100%);
+  mask-image:radial-gradient(ellipse 96% 80% at 50% 50%,#000 36%,transparent 100%);}
+
+/* hero */
+/* title-page ornament: doggy toggy sits in the middle of a tapered rule,
+   the way a printer's ornament sits under a book title */
+.tribute{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:26px;
+  text-align:center;margin:14px 0 46px}
+.tribute::before,.tribute::after{content:"";height:1px}
+.tribute::before{background:linear-gradient(to left,#6b5523,transparent)}
+.tribute::after{background:linear-gradient(to right,#6b5523,transparent)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.emblem{width:86px;height:auto;opacity:.9;grid-column:2;grid-row:1;animation:float 4.8s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.emblem{animation:none}}
+.emblem-cap{grid-column:1 / -1;grid-row:2;margin-top:10px;
+  font-family:var(--disp);font-size:.7rem;letter-spacing:.24em;
+  color:var(--gold3);line-height:1.8;text-transform:uppercase}
+
+/* section heading: the English label sits over a large faint Japanese word,
+   then a hairline runs to the edge (same idea as the Copy / Download buttons) */
+.sec{display:flex;align-items:center;gap:18px;height:66px;margin-bottom:12px}
+/* the watermark and the label share one grid cell, so the hairline always starts
+   after whichever of the two is wider */
+.sec .lab{display:grid;align-items:center;justify-items:start;flex:0 0 auto}
+.sec .lab>*{grid-area:1 / 1}
+.sec .wm{font-family:'Shippori Mincho',serif;font-weight:700;font-size:3.3rem;line-height:1;
+  letter-spacing:.08em;color:rgba(184,146,63,.15);white-space:nowrap;pointer-events:none;user-select:none;
+  margin-left:-3px}
+.sec .en{position:relative;font-family:var(--disp);font-size:.74rem;font-weight:600;
+  letter-spacing:.26em;color:var(--gold2);text-transform:uppercase;white-space:nowrap;padding-left:2px}
+.sec .rule{flex:1;height:1px;background:var(--border)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 216px;gap:52px;align-items:center;margin:0 0 54px}
+.note{font-size:1rem;line-height:1.8;color:var(--text2);text-wrap:pretty}
+.note b{color:var(--text);font-weight:600}
+.note i{color:var(--gold2);font-style:italic}
+.note .jp{display:block;margin-top:14px;padding-top:14px;border-top:1px dotted #3a3020;
+  color:#857a62;font-size:.82rem;line-height:1.9}
+/* the photo is mounted like a plate in a book: thin frame, caption underneath */
+.plate{margin:0;padding:7px;border:1px solid #57461d;background:#0d0b08}
+.portrait{display:block;width:100%;height:auto}
+.plate figcaption{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 2px 5px;white-space:nowrap}
+.plate .pj{font-family:'Shippori Mincho',serif;font-weight:600;font-size:.9rem;line-height:1;
+  letter-spacing:.3em;padding-left:.3em;color:var(--gold2)}
+.plate .pe{font-family:var(--disp);font-size:.5rem;font-weight:600;line-height:1;
+  letter-spacing:.24em;padding-left:.24em;color:var(--gold3);text-transform:uppercase}
+
+/* sections sit open on the page; only the things you touch are boxed */
+.card{margin-bottom:46px}
+textarea{
+  width:100%;min-height:80px;resize:vertical;
+  background:#0b0907;border:1px solid var(--border);
+  border-radius:2px;color:var(--text);
+  font-family:var(--serif);font-size:1.35rem;padding:13px;line-height:1.6;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+textarea:focus{border-color:var(--gold3);box-shadow:0 0 0 3px rgba(184,146,63,.08)}
+textarea::placeholder{color:#3c382e;font-size:.95rem;font-style:italic}
+.hint{font-size:.78rem;color:var(--text2);margin-top:8px;line-height:1.7}
+.hint b{color:var(--gold3);font-weight:600}
+#dictStatus{font-size:.76rem;margin-top:8px;display:flex;align-items:center;gap:7px;color:var(--text2);}
+.dot-pulse{width:8px;height:8px;border-radius:50%;background:var(--gold3);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.dot-ready{width:8px;height:8px;border-radius:50%;background:#7a9a52;}
+.canvas-wrap{position:relative;background:var(--cbg);
+  border:1px solid var(--gold3);border-radius:2px;overflow:hidden;min-height:100px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.5);}
+#outputCanvas{display:block;max-width:100%;height:auto}
+.ph{position:absolute;color:#4a4434;font-size:.92rem;font-style:italic;
+  letter-spacing:.04em;pointer-events:none;text-align:center;line-height:1.8;}
+.ph.gone{display:none}
+.brow{display:flex;gap:12px;flex-wrap:wrap}
+.brow.sub{margin-top:14px}
+button{flex:1;min-width:130px;padding:14px 18px;border:none;border-radius:2px;
+  word-break:keep-all;line-height:1.5;
+  cursor:pointer;font-family:var(--disp);font-size:.74rem;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;
+  transition:background-color .18s,color .18s,border-color .18s,transform .08s;}
+button:active{transform:translateY(1px)}
+button:focus-visible,.srow:focus-within,.pbtn:focus-visible{outline:1px solid var(--gold2);outline-offset:3px}
+button:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+/* Copy / Download: English label over a large faint katakana / kanji watermark.
+   The watermark is spaced wide so its strokes frame the label instead of crossing it
+   (the long bar of コピー would otherwise strike through the words). */
+#copyBtn,#dlBtn{position:relative;overflow:hidden;flex:1 1 52px;height:52px;min-height:52px;padding:0 10px;background:transparent;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap}
+#copyBtn .wm,#dlBtn .wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Shippori Mincho',serif;font-weight:700;font-size:2.2rem;line-height:1;
+  letter-spacing:var(--sp);padding-left:var(--sp);
+  text-transform:none;pointer-events:none;transition:transform .3s,color .3s}
+#copyBtn .en,#dlBtn .en{position:relative;line-height:1;padding-left:.16em}
+#copyBtn{border:1px solid var(--gold);color:#f0d98a}
+#copyBtn .wm{--sp:1.55em;color:rgba(184,146,63,.2)}
+#dlBtn{border:1px solid #3a3020;color:var(--text2)}
+#dlBtn .wm{--sp:3.3em;color:rgba(184,146,63,.13)}
+#copyBtn:hover .wm,#dlBtn:hover .wm{transform:scale(1.05);color:rgba(184,146,63,.32)}
+#dlBtn:hover{color:var(--gold2);border-color:var(--gold3)}
+#status{text-align:center;font-size:.82rem;font-style:italic;min-height:20px;
+  transition:color .3s;color:var(--gold2);margin-top:10px}
+#status.err{color:#d2705a}
+#status:empty{min-height:0;margin:0}
+/* customization */
+/* settings read like a spec sheet: name on the left, value on the right */
+.spec{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,auto);
+  grid-auto-flow:column;column-gap:36px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:44px;border-bottom:1px dotted #3a3020;cursor:pointer;font-size:.95rem}
+.srow .sk{color:var(--text);transition:color .18s}
+.srow:hover .sk{color:var(--gold2)}
+.sv{display:flex;align-items:center;gap:10px}
+.hex{font-size:.78rem;color:var(--text2);letter-spacing:.06em;
+  font-variant-numeric:tabular-nums;text-transform:uppercase}
+.srow input[type=color]{-webkit-appearance:none;appearance:none;width:22px;height:22px;
+  border:1px solid var(--gold3);border-radius:1px;padding:0;cursor:pointer;background:none}
+.srow input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+.srow input[type=color]::-webkit-color-swatch{border:none;border-radius:0}
+.srow input[type=color]::-moz-color-swatch{border:none;border-radius:0}
+/* a gold outline blinks softly around the color squares so people notice they can pick any color */
+@keyframes hint{0%,100%{outline-color:rgba(220,184,102,0)}50%{outline-color:rgba(220,184,102,.9)}}
+.srow input[type=color]{outline:1px solid transparent;outline-offset:3px;animation:hint 3.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.srow input[type=color]{animation:none;outline-color:rgba(220,184,102,.6)}}
+/* toggles: a small ballot box that fills */
+.srow input[type=checkbox]{-webkit-appearance:none;appearance:none;margin:0;
+  width:16px;height:16px;border:1px solid var(--gold3);border-radius:1px;
+  background:transparent;cursor:pointer;flex:0 0 auto;
+  box-shadow:inset 0 0 0 3px var(--card);transition:background-color .15s,border-color .15s}
+.srow input[type=checkbox]:checked{background:var(--gold2);border-color:var(--gold2)}
+.srow:hover input[type=checkbox]{border-color:var(--gold2)}
+.plabel{font-family:var(--disp);font-size:.62rem;letter-spacing:.22em;font-weight:600;
+  color:var(--gold3);text-transform:uppercase;margin:22px 0 10px}
+/* presets are previews: the real glyphs in that preset's colors */
+.presets{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pbtn{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0;padding:0;
+  background:none;border:none;color:var(--text2);font-family:var(--serif);
+  font-size:.78rem;font-weight:400;letter-spacing:.01em;text-transform:none;text-align:left}
+.ptile{height:46px;display:flex;align-items:center;justify-content:center;gap:3px;
+  background:var(--pb);border:1px solid var(--border);border-radius:1px;
+  transition:border-color .18s}
+.ptile.trans{background:repeating-conic-gradient(#1b1710 0 25%,#100d09 0 50%) 0 0/10px 10px}
+.ptile i{width:22px;height:22px;background:var(--ps);
+  -webkit-mask:var(--g) center/contain no-repeat;mask:var(--g) center/contain no-repeat}
+.pbtn:hover{color:var(--gold2)}
+.pbtn:hover .ptile{border-color:var(--gold3)}
+.pbtn[aria-pressed=true]{color:var(--gold2)}
+.pbtn[aria-pressed=true] .ptile{border-color:var(--gold2)}
+/* reference toggle: a small text button at the end of the section's hairline */
+.rtog{flex:0 0 auto;min-width:0;background:none;border:1px solid #3a3020;color:var(--text2);
+  font-family:var(--disp);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:8px 14px;line-height:1;cursor:pointer;white-space:nowrap}
+.rtog:hover{color:var(--gold2);border-color:var(--gold3)}
+.rbody{margin-top:6px;display:none;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rbody.open{display:block}
+.rgrid{display:grid;gap:3px;grid-template-rows:repeat(13,auto);grid-auto-flow:column;grid-auto-columns:minmax(54px,1fr);}
+.rcell{background:#0e0c08;border:1px solid var(--border);border-radius:2px;
+  padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rkana{font-size:.62rem;color:var(--text2);text-align:center}
+.rroma{font-family:var(--disp);font-size:.5rem;color:var(--gold3);text-align:center;letter-spacing:.06em}
+footer{text-align:center;padding:26px 0 8px;font-size:.74rem;color:var(--text2);
+  letter-spacing:.02em;line-height:2;border-top:1px solid var(--border)}
+footer a{color:var(--gold2);text-decoration:none;font:inherit}
+footer a:hover{text-decoration:underline}
+.fdot{color:var(--gold3);margin:0 8px}
+.stats{margin-top:10px;color:var(--gold3);font-size:.78rem;letter-spacing:.05em}
+@media(max-width:1310px){
+  .topbar{flex-direction:column;gap:14px}
+  .t-side{display:none}
+  .corner{flex:0 0 auto;justify-content:center;padding-right:0}
+}
+@media(max-width:720px){
+  .hero{grid-template-columns:1fr;gap:26px;margin-bottom:44px}
+  .plate{max-width:236px;justify-self:center}
+  .tribute{margin-bottom:34px;column-gap:18px}
+  .sec{height:56px}
+  .sec .wm{font-size:2.7rem}
+  .card{margin-bottom:38px}
+  .spec{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}
+  .brow{flex-direction:column}
+  /* presets become a swipeable strip instead of squeezing five tiles */
+  .presets{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:104px;
+    overflow-x:auto;padding-bottom:6px;margin-right:-18px;padding-right:18px;scrollbar-width:none}
+  .presets::-webkit-scrollbar{display:none}
+  .logo{white-space:normal;font-size:1.55rem}
+  .logo-sub{font-size:1.55rem}
+  .ging-top{width:130px}
+}
+@media(max-width:480px){
+  .logo{font-size:1.5rem}
+  .logo-sub{font-size:1.3rem;--ls:.06em;white-space:nowrap}
+  .brow{flex-direction:column}
+  button{min-width:unset;letter-spacing:.08em;padding:14px 10px}
+  button{font-size:clamp(.62rem,3.4vw,.74rem)}
+  button{letter-spacing:.06em}
+  .sec{gap:12px}
+  .sec .en{letter-spacing:.18em;font-size:.7rem}
+  .rtog{padding:8px 10px;letter-spacing:.12em;font-size:.6rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="t-side"></div>
+    <div class="title-stack">
+      <h1 class="logo">Hunter × Hunter Language Translator</h1>
+      <p class="logo-sub" lang="ja">ハンター言語翻訳機</p>
+    </div>
+    <div class="corner">
+      <div class="xwrap">
+        <a class="xlabel" href="https://ko-fi.com/firaspanda" target="_blank" rel="noopener">Support</a>
+        <a class="ging-link" href="https://ko-fi.com/firaspanda" target="_blank" rel="noopener" aria-label="Support me on Ko-fi">
+          <img class="ging-top" src="../assets/ging%20(firas).webp" alt="">
+          <span class="donate-hint" aria-hidden="true">
+            <span class="txt"><span>you can</span><span>donate <span class="w2">now</span></span><span class="jp">ご寄付<span class="jl">いただけます</span></span></span>
+            <svg viewBox="0 0 24 16"><path pathLength="1" d="M1 3.5C8 .5 15 2 21.5 11"/><path class="head" pathLength="1" d="M16.5 10.2 21.5 11l.6-5"/></svg>
+          </span>
+        </a>
+      </div>
+      <div class="xwrap">
+        <span class="xlabel">Contact</span>
+        <a class="xlink" href="https://x.com/sa0rif0" target="_blank" rel="noopener" aria-label="@sa0rif0 on X">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="app">
+
+<div class="tribute">
+  <img class="emblem" src="../assets/doggy%20toggy.png" alt="doggy toggy">
+  <div class="emblem-cap">A tribute to Yoshihiro Togashi</div>
+</div>
+
+<div class="sec"><span class="lab"><span class="wm" aria-hidden="true">仕組み</span><h2 class="en">How it works</h2></span><span class="rule"></span></div>
+<section class="hero">
+  <div class="note">
+    Your text is first turned into Japanese <b>kana</b>, kanji are read phonetically
+    using a built-in dictionary, and each kana is mapped to its glyph in the
+    Hunter × Hunter syllabary. Because the chart covers all 71 base sounds
+    (the full <i>gojūon</i> plus the voiced ゛ and semi-voiced ゜ marks),
+    <b>any</b> Japanese word or phrase can be written in the HxH language.
+    Contracted sounds like きゃ or しょ are written with their full kana (き+や, し+よ),
+    and a long vowel (ー) uses the HxH language's own lengthening symbol, so no sound is ever dropped.
+    <span class="jp" lang="ja">入力文字はかなに変換され、各かながHxH言語の文字に対応します。全71音をカバーしており、拗音（きゃ・しょ等）は大きなかなで、長音（ー）は専用の長音記号で表すため、音が欠けることはありません。</span>
+  </div>
+  <figure class="plate">
+    <img class="portrait" src="../assets/portrait_togashi.webp" alt="Yoshihiro Togashi">
+  </figure>
+</section>
+
+<div class="card">
+  <div class="sec"><span class="lab"><span class="wm" aria-hidden="true">入力</span><label class="en" for="kanaInput">Japanese input</label></span><span class="rule"></span></div>
+  <textarea id="kanaInput" placeholder="Loading sprites… · スプライトを読み込み中…"></textarea>
+  <div id="dictStatus"><span class="dot-ready" id="dictDot"></span><span id="dictMsg">Ready · 準備完了</span></div>
+  <p class="hint">
+    <b>Supported:</b> kanji, hiragana, katakana &amp; mixed text · 漢字・かな・混合テキスト対応<br>
+    <b>Note:</b> numbers, romaji and punctuation are skipped · 数字・ローマ字・記号はスキップ
+  </p>
+</div>
+
+<div class="card">
+  <div class="sec"><span class="lab"><span class="wm" aria-hidden="true">出力</span><h2 class="en">Script output</h2></span><span class="rule"></span></div>
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="outputCanvas"></canvas>
+    <div class="ph" id="ph">Enter text above to reveal the script<br>上記に文字を入力してください</div>
+  </div>
+  <div class="brow sub">
+    <button id="copyBtn" disabled><span class="wm" aria-hidden="true">コピー</span><span class="en">Copy Image</span></button>
+    <button id="dlBtn" disabled><span class="wm" aria-hidden="true">保存</span><span class="en">Download</span></button>
+  </div>
+  <div id="status"></div>
+</div>
+
+<div class="card">
+  <div class="sec"><span class="lab"><span class="wm" aria-hidden="true">設定</span><h2 class="en">Customize image</h2></span><span class="rule"></span></div>
+  <div class="spec">
+    <label class="srow"><span class="sk">Symbol · 文字色</span><span class="sv"><span class="hex" id="symHex"></span><input type="color" id="symColor" value="#c8a840"></span></label>
+    <label class="srow"><span class="sk">Background · 背景</span><span class="sv"><span class="hex" id="bgHex"></span><input type="color" id="bgColor" value="#0a0806"></span></label>
+    <label class="srow"><span class="sk">Transparent · 透明</span><input type="checkbox" id="transBg"></label>
+    <label class="srow"><span class="sk">Grid · 格子</span><input type="checkbox" id="showGrid" checked></label>
+    <label class="srow"><span class="sk">Border · 枠</span><input type="checkbox" id="showBorder" checked></label>
+  </div>
+  <div class="plabel">Presets · プリセット</div>
+  <div class="presets" id="presets">
+    <button class="pbtn" data-sym="#c8a840" data-bg="#0a0806" data-grid="1" data-border="1" data-trans="0"><span class="ptile"></span>Classic Gold</button>
+    <button class="pbtn" data-sym="#ffffff" data-bg="#000000" data-grid="0" data-border="0" data-trans="0"><span class="ptile"></span>White on Black</button>
+    <button class="pbtn" data-sym="#141414" data-bg="#f3ecdd" data-grid="0" data-border="1" data-trans="0"><span class="ptile"></span>Ink on Parchment</button>
+    <button class="pbtn" data-sym="#46e0c0" data-bg="#07100f" data-grid="1" data-border="1" data-trans="0"><span class="ptile"></span>Nen Aura</button>
+    <button class="pbtn" data-sym="#c8a840" data-bg="#0a0806" data-grid="0" data-border="0" data-trans="1"><span class="ptile"></span>Gold · Transparent</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sec"><span class="lab"><span class="wm" aria-hidden="true">文字</span><h2 class="en">Symbol reference</h2></span><span class="rule"></span><button class="rtog" id="rtog" aria-expanded="false">Show · 表示</button></div>
+  <div class="rbody" id="rbody"><div class="rgrid" id="rgrid"></div></div>
+</div>
+<footer>
+  Made by <a href="https://x.com/sa0rif0" target="_blank" rel="noopener">@sa0rif0</a> (Firas) <span class="fdot">·</span> reach out on X with feedback or requests <span class="fdot">·</span> <a href="https://ko-fi.com/firaspanda" target="_blank" rel="noopener">Support me ☕</a>
+  <div id="stats" class="stats" hidden></div>
+</footer>
+</div>
+
+<script>
+// preload every glyph as an <img> up front
+const IMGS = {};
+let spritesReady = false;
+let spritesLoaded = 0;
+const spritesTotal = Object.keys(SPRITES).length;
+
+function onSpriteLoad() {
+  spritesLoaded++;
+  if (spritesLoaded >= spritesTotal) {
+    spritesReady = true;
+    document.getElementById('kanaInput').placeholder =
+      'Enter any Japanese text…\n日本語を入力してください（漢字・かな全て対応）';
+    render();
+  }
+}
+
+for (const [kana, dataUrl] of Object.entries(SPRITES)) {
+  const img = new Image();
+  img.onload = onSpriteLoad;
+  img.onerror = onSpriteLoad;
+  img.src = dataUrl;
+  IMGS[kana] = img;
+}
+
+// katakana -> hiragana
+const K2H = {
+  'ア':'あ','イ':'い','ウ':'う','エ':'え','オ':'お',
+  'カ':'か','キ':'き','ク':'く','ケ':'け','コ':'こ',
+  'サ':'さ','シ':'し','ス':'す','セ':'せ','ソ':'そ',
+  'タ':'た','チ':'ち','ツ':'つ','テ':'て','ト':'と',
+  'ナ':'な','ニ':'に','ヌ':'ぬ','ネ':'ね','ノ':'の',
+  'ハ':'は','ヒ':'ひ','フ':'ふ','ヘ':'へ','ホ':'ほ',
+  'マ':'ま','ミ':'み','ム':'む','メ':'め','モ':'も',
+  'ヤ':'や','ユ':'ゆ','ヨ':'よ',
+  'ラ':'ら','リ':'り','ル':'る','レ':'れ','ロ':'ろ',
+  'ワ':'わ','ヲ':'を','ン':'ん',
+  'ガ':'が','ギ':'ぎ','グ':'ぐ','ゲ':'げ','ゴ':'ご',
+  'ザ':'ざ','ジ':'じ','ズ':'ず','ゼ':'ぜ','ゾ':'ぞ',
+  'ダ':'だ','ヂ':'ぢ','ヅ':'づ','デ':'で','ド':'ど',
+  'バ':'ば','ビ':'び','ブ':'ぶ','ベ':'べ','ボ':'ぼ',
+  'パ':'ぱ','ピ':'ぴ','プ':'ぷ','ペ':'ぺ','ポ':'ぽ',
+  'キャ':'きゃ','キュ':'きゅ','キョ':'きょ',
+  'シャ':'しゃ','シュ':'しゅ','ショ':'しょ',
+  'チャ':'ちゃ','チュ':'ちゅ','チョ':'ちょ',
+  'ニャ':'にゃ','ニュ':'にゅ','ニョ':'にょ',
+  'ヒャ':'ひゃ','ヒュ':'ひゅ','ヒョ':'ひょ',
+  'ミャ':'みゃ','ミュ':'みゅ','ミョ':'みょ',
+  'リャ':'りゃ','リュ':'りゅ','リョ':'りょ',
+  'ギャ':'ぎゃ','ギュ':'ぎゅ','ギョ':'ぎょ',
+  'ジャ':'じゃ','ジュ':'じゅ','ジョ':'じょ',
+  'ビャ':'びゃ','ビュ':'びゅ','ビョ':'びょ',
+  'ピャ':'ぴゃ','ピュ':'ぴゅ','ピョ':'ぴょ',
+  'ッ':'っ',
+};
+
+// turn the text into a stream of glyph keys, without dropping sounds:
+// small kana (ゃゅょ / ぁぃぅぇぉ) -> their full-size kana, the sokuon っ -> つ,
+// and the long-vowel mark ー -> a repeat of the previous syllable's vowel.
+function toCanonical(ch) { return K2H[ch] || ch; }
+const SMALL = {
+  'ゃ':'や','ゅ':'ゆ','ょ':'よ','ャ':'や','ュ':'ゆ','ョ':'よ',
+  'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お','ァ':'あ','ィ':'い','ゥ':'う','ェ':'え','ォ':'お'
+};
+const SOKUON = new Set(['っ','ッ']);
+// each base kana -> the vowel it ends on (for the long-vowel mark)
+const VOWEL = (() => {
+  const m = {};
+  const rows = {
+    'あ':'あいうえお','か':'かきくけこ','さ':'さしすせそ','た':'たちつてと','な':'なにぬねの',
+    'は':'はひふへほ','ま':'まみむめも','ら':'らりるれろ','が':'がぎぐげご','ざ':'ざじずぜぞ',
+    'だ':'だぢづでど','ば':'ばびぶべぼ','ぱ':'ぱぴぷぺぽ'
+  };
+  const vow = 'あいうえお';
+  for (const r of Object.values(rows)) for (let i = 0; i < r.length; i++) m[r[i]] = vow[i];
+  m['や']='あ'; m['ゆ']='う'; m['よ']='お'; m['わ']='あ'; m['を']='お';
+  return m;
+})();
+
+function parseKana(text) {
+  const out = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (SMALL[ch]) { if (IMGS[SMALL[ch]]) out.push(SMALL[ch]); continue; }   // small kana -> full kana
+    if (SOKUON.has(ch)) { if (IMGS['つ']) out.push('つ'); continue; }         // っ -> つ
+    if (ch === 'ー') {                                                        // long vowel
+      if (IMGS['ー']) { out.push('ー'); continue; }                            // use the chart's lengthening symbol
+      const prev = out.length ? out[out.length - 1] : null;                   // fallback: repeat the vowel
+      const v = prev && VOWEL[prev];
+      if (v && IMGS[v]) out.push(v);
+      continue;
+    }
+    const key = toCanonical(ch);
+    if (IMGS[key]) out.push(key);
+    else if (' 　\n\r'.includes(ch)) out.push(' ');
+  }
+  return out;
+}
+
+// Kanji readings come from kuromoji. It runs in a Web Worker so the heavy
+// dictionary build/tokenise never blocks the UI (which used to freeze the tab).
+const KANJI = /[㐀-鿿]/;
+let dictState = 'idle', kuroWorker = null;
+const readingCache = new Map();   // raw input -> all-kana reading
+const pendingReq = new Set();
+
+function setDictStatus(state) {
+  const dot = document.getElementById('dictDot');
+  const msg = document.getElementById('dictMsg');
+  if (state === 'ready') { dot.className = 'dot-ready';
+    msg.textContent = 'Kanji dictionary ready · 漢字辞書 準備完了'; }
+  else if (state === 'loading') { dot.className = 'dot-pulse';
+    msg.textContent = 'Loading kanji dictionary… · 漢字辞書 読み込み中…'; }
+  else if (state === 'fail') { dot.className = 'dot-ready';
+    msg.textContent = 'Dictionary unavailable — kana still works · かなは利用可'; }
+  else { dot.className = 'dot-ready';
+    msg.textContent = 'Ready · kana is instant, kanji loads on demand · 準備完了'; }
+}
+
+function ensureWorker() {
+  if (kuroWorker || dictState === 'loading' || dictState === 'fail') return;
+  dictState = 'loading'; setDictStatus('loading');
+  const code = [
+    "importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');",
+    "var tk=null;",
+    "kuromoji.builder({dicPath:'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/'})",
+    " .build(function(e,t){ if(e){postMessage({err:String(e)});return;} tk=t; postMessage({ready:1}); });",
+    "onmessage=function(ev){",
+    "  var text=ev.data.text;",
+    "  if(!tk){ postMessage({text:text, reading:text}); return; }",
+    "  var r=tk.tokenize(text).map(function(x){return x.reading||x.surface_form;}).join('');",
+    "  postMessage({text:text, reading:r});",
+    "};"
+  ].join('\n');
+  try {
+    const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+    kuroWorker = new Worker(url);
+    kuroWorker.onmessage = (ev) => {
+      const d = ev.data;
+      if (d.ready) { dictState = 'ready'; setDictStatus('ready'); render(); return; }
+      if (d.err)   { dictState = 'fail'; setDictStatus('fail'); return; }
+      if (d.text !== undefined) {
+        readingCache.set(d.text, d.reading);
+        pendingReq.delete(d.text);
+        if (document.getElementById('kanaInput').value === d.text) render();
+      }
+    };
+    kuroWorker.onerror = () => { dictState = 'fail'; setDictStatus('fail'); };
+  } catch (e) { dictState = 'fail'; setDictStatus('fail'); }
+}
+
+function toKana(text) {
+  if (!KANJI.test(text)) return text;             // pure kana: instant, no dictionary
+  if (readingCache.has(text)) return readingCache.get(text);
+  ensureWorker();
+  if (dictState === 'ready' && !pendingReq.has(text)) {
+    pendingReq.add(text);
+    kuroWorker.postMessage({ text });             // convert off-thread
+  }
+  return text;   // render the kana now; kanji fill in when the worker replies
+}
+
+setDictStatus('idle');
+
+// output appearance
+const settings = {
+  sym: '#c8a840',
+  bg: '#0a0806',
+  transBg: false,
+  grid: true,
+  border: true,
+};
+
+function hexA(hex, a) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+const tintCache = new Map();
+function tinted(key, color) {
+  const ck = key + '|' + color;
+  if (tintCache.has(ck)) return tintCache.get(ck);
+  const img = IMGS[key];
+  const w = img.naturalWidth || 64, h = img.naturalHeight || 64;
+  const t = document.createElement('canvas');
+  t.width = w; t.height = h;
+  const tx = t.getContext('2d');
+  tx.drawImage(img, 0, 0);
+  tx.globalCompositeOperation = 'source-in';
+  tx.fillStyle = color;
+  tx.fillRect(0, 0, w, h);
+  tintCache.set(ck, t);
+  return t;
+}
+
+// canvas drawing
+const CELL = 48;
+const GAP  = 8;
+const LGAP = 12;
+const CM   = 24;
+
+const canvas = document.getElementById('outputCanvas');
+const ctx = canvas.getContext('2d');
+const ph = document.getElementById('ph');
+
+function drawBG(w, h) {
+  ctx.clearRect(0, 0, w, h);
+  if (!settings.transBg) {
+    ctx.fillStyle = settings.bg;
+    ctx.fillRect(0, 0, w, h);
+  }
+  if (settings.grid) {
+    ctx.strokeStyle = hexA(settings.sym, .07);
+    ctx.lineWidth = .5;
+    const st = CELL + GAP;
+    for (let x = 0; x < w; x += st) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += st) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  }
+  if (settings.border) {
+    ctx.strokeStyle = hexA(settings.sym, .42);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(3, 3, w - 6, h - 6);
+    ctx.strokeStyle = hexA(settings.sym, .12);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(9, 9, w - 18, h - 18);
+  }
+}
+
+function renderSymbols(tokens) {
+  const CW = 620;
+  const step = CELL + GAP;
+  const cols = Math.floor((CW - CM * 2) / step);
+  const rows = [];
+  let row = [];
+  for (const t of tokens) {
+    if (t === ' ') {
+      if (row.length) { rows.push(row); row = []; }
+    } else {
+      row.push(t);
+      if (row.length >= cols) { rows.push(row); row = []; }
+    }
+  }
+  if (row.length) rows.push(row);
+
+  const nr = rows.length || 1;
+  canvas.width = CW;
+  canvas.height = Math.max(CM * 2 + nr * CELL + (nr - 1) * LGAP + 6, 90);
+
+  drawBG(CW, canvas.height);
+
+  let yOff = CM + 2;
+  for (const rw of rows) {
+    let xOff = CM;
+    for (const key of rw) {
+      const img = IMGS[key];
+      if (img && img.complete) {
+        ctx.drawImage(tinted(key, settings.sym), xOff, yOff, CELL, CELL);
+      }
+      xOff += step;
+    }
+    yOff += CELL + LGAP;
+  }
+}
+
+function setExportEnabled(on) {
+  document.getElementById('copyBtn').disabled = !on;
+  document.getElementById('dlBtn').disabled = !on;
+}
+
+function render() {
+  if (!spritesReady) return;
+  const raw = document.getElementById('kanaInput').value;
+  const kana = toKana(raw);
+  const tokens = parseKana(kana);
+  const vis = tokens.filter(t => t !== ' ');
+  if (!vis.length) {
+    canvas.width = 2; canvas.height = 2;
+    ph.classList.remove('gone');
+    setExportEnabled(false);
+    return;
+  }
+  ph.classList.add('gone');
+  setExportEnabled(true);
+  renderSymbols(tokens);
+  if (!window._didTranslate) { window._didTranslate = true; track('translate', 'Translated text'); }
+}
+
+document.getElementById('kanaInput').addEventListener('input', render);
+
+// controls
+function syncControls() {
+  document.getElementById('symColor').value = settings.sym;
+  document.getElementById('bgColor').value = settings.bg;
+  document.getElementById('transBg').checked = settings.transBg;
+  document.getElementById('showGrid').checked = settings.grid;
+  document.getElementById('showBorder').checked = settings.border;
+  document.getElementById('canvasWrap').style.background = settings.transBg ? 'var(--cbg)' : settings.bg;
+  document.getElementById('symHex').textContent = settings.sym;
+  document.getElementById('bgHex').textContent = settings.transBg ? 'none' : settings.bg;
+  // light up the preset that matches the current settings, if any
+  document.querySelectorAll('.pbtn').forEach(b => {
+    const d = b.dataset, on = d.sym === settings.sym && d.trans === (settings.transBg ? '1' : '0') &&
+      (settings.transBg || d.bg === settings.bg) &&
+      d.grid === (settings.grid ? '1' : '0') && d.border === (settings.border ? '1' : '0');
+    b.setAttribute('aria-pressed', on);
+  });
+}
+// preset tiles preview three real glyphs (は・ん・た) in each preset's colors
+document.querySelectorAll('.pbtn').forEach(b => {
+  const t = b.querySelector('.ptile'), d = b.dataset;
+  t.style.setProperty('--pb', d.bg); t.style.setProperty('--ps', d.sym);
+  if (d.trans === '1') t.classList.add('trans');
+  for (const k of ['は', 'ん', 'た']) {
+    if (!SPRITES[k]) continue;
+    const g = document.createElement('i'); g.style.setProperty('--g', `url(${SPRITES[k]})`); t.appendChild(g);
+  }
+});
+document.getElementById('symColor').addEventListener('input', e => { settings.sym = e.target.value; tintCache.clear(); syncControls(); render(); });
+document.getElementById('bgColor').addEventListener('input', e => { settings.bg = e.target.value; syncControls(); render(); });
+document.getElementById('transBg').addEventListener('change', e => { settings.transBg = e.target.checked; syncControls(); render(); });
+document.getElementById('showGrid').addEventListener('change', e => { settings.grid = e.target.checked; syncControls(); render(); });
+document.getElementById('showBorder').addEventListener('change', e => { settings.border = e.target.checked; syncControls(); render(); });
+document.getElementById('presets').addEventListener('click', e => {
+  const b = e.target.closest('.pbtn'); if (!b) return;
+  settings.sym = b.dataset.sym; tintCache.clear();
+  settings.bg = b.dataset.bg;
+  settings.grid = b.dataset.grid === '1';
+  settings.border = b.dataset.border === '1';
+  settings.transBg = b.dataset.trans === '1';
+  syncControls(); render();
+  track('preset', 'Preset: ' + b.textContent.trim());
+});
+syncControls();
+
+// visit + image-created tracking (GoatCounter). Set GC to your code after signing up.
+const GC = 'hxhlanguage';  // GoatCounter dashboard: https://hxhlanguage.goatcounter.com
+if (GC) {
+  const gs = document.createElement('script');
+  gs.async = true; gs.src = '//gc.zgo.at/count.js';
+  gs.setAttribute('data-goatcounter', 'https://' + GC + '.goatcounter.com/count');
+  document.head.appendChild(gs);
+}
+function track(path, title) {
+  if (window.goatcounter && goatcounter.count)
+    goatcounter.count({ path: path, title: title, event: true });
+}
+async function showStats() {
+  if (!GC) return;
+  const base = 'https://' + GC + '.goatcounter.com/counter/';
+  const get = p => fetch(base + p + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+  const num = x => (x && x.count) ? parseInt(String(x.count).replace(/[^0-9]/g, '')) || 0 : 0;
+  const [v, dl, cp] = await Promise.all([get('TOTAL'), get('download'), get('copy')]);
+  const made = num(dl) + num(cp);
+  const parts = [];
+  if (v && v.count) parts.push(v.count + ' visits');
+  if (made) parts.push(made.toLocaleString() + ' images made');
+  const el = document.getElementById('stats');
+  if (parts.length) { el.textContent = parts.join('   ·   '); el.hidden = false; }
+}
+showStats();
+
+// copy / download
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const st = document.getElementById('status');
+  if (!navigator.clipboard?.write) {
+    st.textContent = '⚠ Clipboard needs HTTPS · クリップボードはHTTPSが必要';
+    st.className = 'err'; setTimeout(() => { st.textContent = ''; }, 3500); return;
+  }
+  try {
+    await new Promise((res, rej) => canvas.toBlob(async blob => {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        res();
+      } catch (e) { rej(e); }
+    }, 'image/png'));
+    st.textContent = '✓ Copied to clipboard · コピーしました';
+    st.className = '';
+    track('copy', 'Copied image');
+  } catch (e) {
+    st.textContent = '✗ Copy failed · コピー失敗: ' + e.message;
+    st.className = 'err';
+  }
+  setTimeout(() => { st.textContent = ''; }, 3200);
+});
+
+document.getElementById('dlBtn').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'hunter-script.png'; a.click();
+  track('download', 'Downloaded image');
+});
+
+// symbol chart
+document.getElementById('rtog').addEventListener('click', () => {
+  const rb = document.getElementById('rbody');
+  const open = rb.classList.toggle('open');
+  const rt = document.getElementById('rtog');
+  rt.textContent = open ? 'Hide · 閉じる' : 'Show · 表示';
+  rt.setAttribute('aria-expanded', open);
+  if (open && !rb.dataset.built) buildRef();
+  if (open) track('reference-opened', 'Opened symbol reference');
+});
+
+// same order as the printed chart: alphabetical by romaji, top-to-bottom per column
+const REF = [
+  ['あ','A'],  ['ち','CHI'],['え','E'],  ['は','HA'], ['へ','HE'], ['ひ','HI'],
+  ['ほ','HO'], ['ふ','FU'], ['い','I'],  ['か','KA'], ['け','KE'], ['き','KI'],
+  ['こ','KO'], ['く','KU'], ['ま','MA'], ['め','ME'], ['み','MI'], ['も','MO'],
+  ['む','MU'], ['ん','N'],  ['な','NA'], ['ね','NE'], ['に','NI'], ['の','NO'], ['ぬ','NU'],
+  ['お','O'],  ['ら','RA'], ['れ','RE'], ['り','RI'], ['ろ','RO'], ['る','RU'],
+  ['さ','SA'], ['せ','SE'], ['し','SHI'],['そ','SO'], ['す','SU'], ['た','TA'],
+  ['て','TE'], ['と','TO'], ['つ','TSU'],['う','U'],  ['わ','WA'], ['を','WO'],
+  ['や','YA'], ['よ','YO'], ['ゆ','YU'], ['ざ','ZA'], ['ぜ','ZE'], ['ー','LONG'],
+  ['ぞ','ZO'], ['ず','ZU'], ['ば','BA'], ['べ','BE'], ['び','BI'], ['ぼ','BO'],
+  ['ぶ','BU'], ['だ','DA'], ['で','DE'], ['ぢ','DI'], ['ど','DO'], ['づ','DU'],
+  ['が','GA'], ['げ','GE'], ['ぎ','GI'], ['ご','GO'], ['ぐ','GU'], ['じ','JI'],
+  ['ぱ','PA'], ['ぺ','PE'], ['ぴ','PI'], ['ぽ','PO'], ['ぷ','PU'],
+];
+
+function buildRef() {
+  const grid = document.getElementById('rgrid');
+  const RS = 40;
+  for (const [kana, roma] of REF) {
+    const key = K2H[kana] || kana;
+    const img = IMGS[key] || IMGS[kana];
+    if (!img) continue;
+    const cell = document.createElement('div'); cell.className = 'rcell';
+    const cv = document.createElement('canvas'); cv.width = RS; cv.height = RS;
+    const cx = cv.getContext('2d');
+    cx.fillStyle = '#0e0c08'; cx.fillRect(0, 0, RS, RS);
+    if (img.complete) cx.drawImage(tinted(kana, '#c8a840'), 0, 0, RS, RS);
+    const lk = document.createElement('div'); lk.className = 'rkana'; lk.textContent = kana;
+    const lr = document.createElement('div'); lr.className = 'rroma'; lr.textContent = roma;
+    cell.appendChild(cv); cell.appendChild(lk); cell.appendChild(lr);
+    grid.appendChild(cell);
+  }
+  document.getElementById('rbody').dataset.built = '1';
+}
+
+render();
+</script>
+</body>
+</html>
